@@ -14,7 +14,7 @@ from model import Model
 #os.environ['CUDA_VISIBLE_DEVICES'] = '-1'
 random.seed(1234)
 np.random.seed(1234)
-tf.set_random_seed(1234) 
+tf.compat.v1.set_random_seed(1234)
 
 learning_rate = 0.1
 keep_prob = 0.5
@@ -24,16 +24,16 @@ trunc_len = 10
 train_batch_size = 64
 test_batch_size = 64
 
-workdir = '/home/myronwu/DANSER-WWW-19' # change to your workdir
-with open(workdir+'/data/dataset.pkl', 'rb') as f:
-	train_set = pickle.load(f)
+workdir = 'DANSER-WWW-19' # change to your workdir
+with open('data/dataset.pkl', 'rb') as f:
+	train_set = pickle.load(f)#load pickled data from a file-like object
 	test_set = pickle.load(f)
-with open(workdir+'/data/list.pkl', 'rb') as f:
-    u_friend_list = pickle.load(f)
+with open('data/list.pkl', 'rb') as f:
+    u_friend_list = pickle.load(f)#for a specific user, his friend list
     u_read_list = pickle.load(f)
     uf_read_list = pickle.load(f) 
     i_friend_list = pickle.load(f)
-    i_read_list = pickle.load(f)
+    i_read_list = pickle.load(f)#for a specific item, the userset have consumed it
     if_read_list = pickle.load(f)
     i_link_list = pickle.load(f)
     user_count, item_count = pickle.load(f)
@@ -93,11 +93,11 @@ def _eval(sess, model):
 	return loss_sum/batch, Precision, NDCG, MAE, RMSE
 
 
-gpu_options = tf.GPUOptions(allow_growth=True)
-with tf.Session() as sess:
+gpu_options = tf.compat.v1.GPUOptions(allow_growth=True)
+with tf.compat.v1.Session() as sess:
 	model = Model(user_count, item_count)
-	sess.run(tf.global_variables_initializer())
-	sess.run(tf.local_variables_initializer()) 
+	sess.run(tf.compat.v1.global_variables_initializer())
+	sess.run(tf.compat.v1.local_variables_initializer())
 
 	sys.stdout.flush()
 	lr = learning_rate
