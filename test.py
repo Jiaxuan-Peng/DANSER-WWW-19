@@ -14,7 +14,7 @@ from model import Model
 #os.environ['CUDA_VISIBLE_DEVICES'] = '-1'
 random.seed(1234)
 np.random.seed(1234)
-tf.set_random_seed(1234) 
+tf.random.set_seed(1234)
 
 learning_rate = 0.1
 keep_prob = 0.5
@@ -24,11 +24,11 @@ trunc_len = 10
 train_batch_size = 64
 test_batch_size = 64
 
-workdir = '/home/myronwu/DANSER-WWW-19' # change to your workdir
-with open(workdir+'/data/dataset.pkl', 'rb') as f:
+workdir = 'DANSER-WWW-19' # change to your workdir
+with open('data/dataset.pkl', 'rb') as f:
 	train_set = pickle.load(f)
 	test_set = pickle.load(f)
-with open(workdir+'/data/list.pkl', 'rb') as f:
+with open('data/list.pkl', 'rb') as f:
     u_friend_list = pickle.load(f)
     u_read_list = pickle.load(f)
     uf_read_list = pickle.load(f) 
@@ -92,10 +92,10 @@ def _eval(sess, model):
 	Precision, NDCG, AUC, GPrecision, GAUC, MAE, RMSE = get_metric(score_label) 
 	return loss_sum/batch, Precision, NDCG, MAE, RMSE
 
-gpu_options = tf.GPUOptions(allow_growth=True)
-with tf.Session() as sess:
+gpu_options = tf.compat.v1.GPUOptions(allow_growth=True)
+with tf.compat.v1.Session() as sess:
 	model = Model(user_count, item_count)
-	model.restore(sess, workdir+'/model/DUAL_GAT.ckpt')
+	model.restore(sess, 'model/DUAL_GAT.ckpt')
 
 	Test_loss, P, N, MAE, RMSE = _eval(sess, model)
 	print('Test_loss: %.4f P@3: %.4f P@5: %.4f P@10: %.4f NDCG@3: %.4f NDCG@5: %.4f NDCG@10: %.4f MAE: %.4f RMSE: %.4f' %

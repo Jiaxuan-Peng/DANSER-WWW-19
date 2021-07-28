@@ -5,11 +5,11 @@ import pandas as pd
 
 random.seed(1234)
 
-workdir = '/home/myronwu/DANSER-WWW-19' # change to your workdir
-click_f = np.loadtxt(workdir+'/data/ratings_data.txt', dtype = np.int32)
-trust_f = np.loadtxt(workdir+'/data/trust_data.txt', dtype = np.int32)
+workdir = 'DANSER-WWW-19' # change to your workdir
+click_f = np.loadtxt('data/ratings_data.txt', dtype = np.int32)
+trust_f = np.loadtxt('data/trust_data.txt', dtype = np.int32)
 
-click_list = []
+click_list = []#uid, iid, label
 trust_list = []
 
 u_read_list = []
@@ -35,37 +35,35 @@ for s in click_f:
 pos_list = []
 for i in range(len(click_list)):
 	pos_list.append((click_list[i][0], click_list[i][1], click_list[i][2]))
-random.shuffle(pos_list)
+random.shuffle(pos_list)#changes the x list in place
 train_set = pos_list[:int(0.8*len(pos_list))]
 test_set = pos_list[int(0.8*len(pos_list)):len(pos_list)]
 print(len(train_set))
 
-with open(workdir+'/data/dataset.pkl', 'wb') as f:
-	pickle.dump(train_set, f, pickle.HIGHEST_PROTOCOL)
+with open('data/dataset.pkl', 'wb') as f:
+	pickle.dump(train_set, f, pickle.HIGHEST_PROTOCOL)#store the object data to the file
 	pickle.dump(test_set, f, pickle.HIGHEST_PROTOCOL)
-
 
 train_df = pd.DataFrame(train_set, columns = ['uid', 'iid', 'label'])
 test_df = pd.DataFrame(test_set, columns = ['uid', 'iid', 'label'])
-
 click_df = pd.DataFrame(click_list, columns = ['uid', 'iid', 'label'])
-train_df = train_df.sort_values(axis = 0, ascending = True, by = 'uid')
 
+train_df = train_df.sort_values(axis = 0, ascending = True, by = 'uid')
 for u in range(user_count+1):
 	hist = train_df[train_df['uid']==u]
 	#hist = hist[hist['label']>3]
-	u_read = hist['iid'].unique().tolist()
+	u_read = hist['iid'].unique().tolist()#the itemset of users
+	print(hist['iid'])
 	if u_read==[]:
 		u_read_list.append([0])
 	else:
 		u_read_list.append(u_read)
 
 train_df = train_df.sort_values(axis = 0, ascending = True, by = 'iid')
-
 for i in range(item_count+1):
 	hist = train_df[train_df['iid']==i]
 	#hist = hist[hist['label']>3]
-	i_read = hist['uid'].unique().tolist()
+	i_read = hist['uid'].unique().tolist()#the userset of items
 	if i_read==[]:
 		i_read_list.append([0])
 	else:
@@ -79,11 +77,11 @@ for s in trust_f:
 	trust_list.append([uid, fid])
 
 trust_df = pd.DataFrame(trust_list, columns = ['uid', 'fid'])
-trust_df = trust_df.sort_values(axis = 0, ascending = True, by = 'uid')
 
+trust_df = trust_df.sort_values(axis = 0, ascending = True, by = 'uid')
 for u in range(user_count+1):
 	hist = trust_df[trust_df['uid']==u]
-	u_friend = hist['fid'].unique().tolist()
+	u_friend = hist['fid'].unique().tolist()#the friend-list of users
 	if u_friend==[]:
 		u_friend_list.append([0])
 		uf_read_list.append([[0]])
@@ -127,7 +125,7 @@ for i in range(item_count+1):
 		for f in i_friend_i:
 			if_read_f.append(i_read_list[f])
 		if_read_list.append(if_read_f)
-	
+
 with open(workdir+'/data/list.pkl', 'wb') as f:
 	pickle.dump(u_friend_list, f, pickle.HIGHEST_PROTOCOL)
 	pickle.dump(u_read_list, f, pickle.HIGHEST_PROTOCOL)
